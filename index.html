@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CAPS Personal Style Inventory</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#F0F4FF;min-height:100vh;color:#1F2937}
+.topbar{background:#2563EB;padding:0 20px;height:54px;display:flex;align-items:center;gap:12px;position:sticky;top:0;z-index:10;box-shadow:0 2px 8px rgba(37,99,235,.3)}
+.topbar-logo{width:34px;height:34px;background:rgba(255,255,255,.2);border-radius:8px;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:15px}
+.topbar h1{font-size:15px;font-weight:600;color:white}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.prog-bar{width:110px;height:5px;background:rgba(255,255,255,.25);border-radius:99px;overflow:hidden}
+.prog-fill{height:100%;background:white;border-radius:99px;transition:width .4s ease;width:0%}
+.prog-lbl{font-size:12px;color:rgba(255,255,255,.75);font-weight:500;min-width:32px;text-align:right}
+.wrap{max-width:600px;margin:0 auto;padding:32px 16px 64px}
+.start-card{background:white;border-radius:18px;box-shadow:0 4px 24px rgba(37,99,235,.1);padding:44px 36px;text-align:center}
+.pill{display:inline-block;background:#EFF6FF;color:#2563EB;font-size:11px;font-weight:700;padding:5px 16px;border-radius:99px;letter-spacing:.07em;margin-bottom:20px}
+.start-card h2{font-size:26px;font-weight:700;color:#0F172A;margin-bottom:12px;line-height:1.3}
+.start-card .sub{font-size:14px;color:#6B7280;line-height:1.75;margin-bottom:30px}
+.info-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
+.info-box{background:#F8FAFF;border:1px solid #E0E9FF;border-radius:12px;padding:16px 8px;text-align:center}
+.info-box .n{font-size:26px;font-weight:700;color:#2563EB}
+.info-box .l{font-size:11px;color:#9CA3AF;margin-top:3px;font-weight:500}
+.field-lbl{font-size:13px;font-weight:600;color:#374151;text-align:left;margin-bottom:7px}
+.field-in{width:100%;padding:12px 16px;border:1.5px solid #E5E7EB;border-radius:10px;font-size:15px;color:#1F2937;outline:none;transition:all .2s;margin-bottom:18px}
+.field-in:focus{border-color:#2563EB;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.btn-start{width:100%;padding:14px;background:#2563EB;color:white;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;transition:all .2s}
+.btn-start:hover:not(:disabled){background:#1D4ED8;box-shadow:0 4px 12px rgba(37,99,235,.3)}
+.btn-start:disabled{background:#93C5FD;cursor:not-allowed}
+#quiz-sec{display:none}
+.q-card{background:white;border-radius:16px;box-shadow:0 2px 16px rgba(0,0,0,.06);padding:28px 26px;margin-bottom:14px}
+.q-eye{font-size:11px;font-weight:700;color:#2563EB;letter-spacing:.09em;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.q-eye::after{content:'';flex:1;height:1px;background:#EFF6FF}
+.q-txt{font-size:15px;font-weight:500;color:#0F172A;line-height:1.7;margin-bottom:22px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{padding:15px 16px;border:1.5px solid #E5E7EB;border-radius:12px;background:#F9FAFB;cursor:pointer;text-align:left;transition:all .2s;user-select:none}
+.opt:hover{border-color:#93C5FD;background:#EFF6FF}
+.opt.sel{border-color:#2563EB;background:#EFF6FF;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.opt-lbl{font-size:11px;font-weight:700;color:#9CA3AF;margin-bottom:7px;letter-spacing:.06em}
+.opt.sel .opt-lbl{color:#2563EB}
+.opt-txt{font-size:13px;color:#4B5563;line-height:1.55}
+.opt.sel .opt-txt{color:#1E40AF;font-weight:500}
+.nav-row{display:flex;gap:10px}
+.btn-nav{flex:1;padding:13px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s;border:1.5px solid #E5E7EB;background:white;color:#6B7280}
+.btn-nav:hover:not(:disabled){border-color:#9CA3AF;background:#F9FAFB}
+.btn-nav:disabled{opacity:.3;cursor:not-allowed}
+.btn-nav.pri{background:#2563EB;border-color:#2563EB;color:white}
+.btn-nav.pri:hover:not(:disabled){background:#1D4ED8}
+.loading-overlay{display:none;position:fixed;inset:0;background:rgba(248,250,255,.92);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:16px}
+.loading-overlay.show{display:flex}
+.spinner{width:44px;height:44px;border:3px solid #DBEAFE;border-top-color:#2563EB;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-txt{font-size:14px;color:#4B5563;font-weight:500}
+#thanks-sec{display:none}
+.thanks-card{background:white;border-radius:18px;box-shadow:0 4px 24px rgba(37,99,235,.1);padding:52px 36px;text-align:center}
+.thanks-icon{width:80px;height:80px;background:#ECFDF5;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:36px}
+.thanks-card h2{font-size:24px;font-weight:700;color:#0F172A;margin-bottom:8px}
+.nama-tag{font-size:20px;font-weight:700;color:#2563EB;margin-bottom:20px}
+.thanks-card p{font-size:14px;color:#6B7280;line-height:1.75;margin-bottom:8px}
+.thanks-note{background:#F8FAFF;border:1px solid #E0E9FF;border-radius:12px;padding:16px 20px;font-size:13px;color:#6B7280;line-height:1.7;margin-bottom:28px}
+.btn-ulang{padding:12px 32px;border:1.5px solid #E5E7EB;border-radius:10px;background:white;font-size:14px;font-weight:500;color:#6B7280;cursor:pointer}
+.btn-ulang:hover{background:#F9FAFB}
+@media(max-width:520px){.opts{grid-template-columns:1fr}.info-row{grid-template-columns:1fr}.start-card,.thanks-card{padding:32px 20px}}
+</style>
+</head>
+<body>
+
+<!-- Netlify Forms detection — JANGAN HAPUS -->
+<form name="caps-results" netlify netlify-honeypot="bot-field" hidden>
+  <input type="text" name="nama"/>
+  <input type="text" name="skor_O"/>
+  <input type="text" name="skor_G"/>
+  <input type="text" name="skor_D"/>
+  <input type="text" name="skor_I"/>
+  <input type="text" name="kode"/>
+  <input type="text" name="tipe"/>
+  <input type="text" name="tanggal"/>
+  <input type="text" name="jawaban"/>
+  <input type="text" name="lembar_jawaban"/>
+</form>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-txt">Mengirim jawaban...</div>
+</div>
+
+<div class="topbar">
+  <div class="topbar-logo">C</div>
+  <h1>CAPS Assessment</h1>
+  <div class="topbar-right">
+    <div class="prog-bar"><div class="prog-fill" id="prog"></div></div>
+    <span class="prog-lbl" id="prog-lbl">0/18</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <!-- START -->
+  <div id="start-sec">
+    <div class="start-card">
+      <div class="pill">C.A.P.S. PERSONAL STYLE INVENTORY</div>
+      <h2>Kenali Gaya Personal Anda</h2>
+      <p class="sub">Jawab 18 pertanyaan berikut dengan jujur. Pilih jawaban yang paling menggambarkan diri Anda sehari-hari — bukan yang Anda anggap "ideal".</p>
+      <div class="info-row">
+        <div class="info-box"><div class="n">18</div><div class="l">Pertanyaan</div></div>
+        <div class="info-box"><div class="n">±5'</div><div class="l">Waktu</div></div>
+        <div class="info-box"><div class="n">4</div><div class="l">Tipe Gaya</div></div>
+      </div>
+      <div class="field-lbl">📝 Nama Lengkap</div>
+      <input class="field-in" id="nama-in" type="text" placeholder="Masukkan nama lengkap Anda..." autocomplete="name"/>
+      <button class="btn-start" onclick="startQuiz()">Mulai Kuesioner →</button>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz-sec">
+    <div class="q-card" id="q-card"></div>
+    <div class="nav-row">
+      <button class="btn-nav" id="btn-prev" onclick="prevQ()" disabled>← Sebelumnya</button>
+      <button class="btn-nav pri" id="btn-next" onclick="nextQ()">Selanjutnya →</button>
+    </div>
+  </div>
+
+  <!-- TERIMA KASIH -->
+  <div id="thanks-sec">
+    <div class="thanks-card">
+      <div class="thanks-icon">✓</div>
+      <h2>Terima Kasih!</h2>
+      <div class="nama-tag" id="thanks-nama"></div>
+      <p>Jawaban Anda telah berhasil tersimpan.</p>
+      <div class="thanks-note">📋 Hasil kuesioner Anda akan dianalisis oleh tim dan dikomunikasikan lebih lanjut.</div>
+      <button class="btn-ulang" onclick="resetAll()">↺ Isi Ulang Kuesioner</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const Qs=[
+  {q:"Saya biasanya terbuka untuk mengenal orang-orang secara pribadi dan menjalin hubungan dengan mereka.",a:"Terbuka mengenal orang secara pribadi",b:"Tidak terbiasa terbuka mengenal orang secara pribadi",k:{A:'O',B:'D'}},
+  {q:"Saya biasanya bereaksi perlahan dan direncanakan.",a:"Bereaksi perlahan dan direncanakan",b:"Bereaksi cepat dan spontan",k:{A:'G',B:'I'}},
+  {q:"Saya biasanya menjaga dalam memberikan waktu saya untuk orang lain.",a:"Menjaga waktu untuk orang lain",b:"Terbuka dalam memberikan waktu untuk orang lain",k:{A:'D',B:'O'}},
+  {q:"Saya biasanya memperkenalkan diri saya saat pertemuan sosial.",a:"Memperkenalkan diri saat pertemuan sosial",b:"Menunggu orang lain memperkenalkan diri",k:{A:'I',B:'G'}},
+  {q:"Saya biasanya fokus membicarakan kepentingan orang yang terlibat meskipun diluar dari bisnis atau tugas.",a:"Fokus pada kepentingan orang yang terlibat",b:"Fokus pada tugas, masalah, dan bisnis",k:{A:'O',B:'D'}},
+  {q:"Saya biasanya kurang tegas dan bisa bersabar dengan kecepatan lambat.",a:"Kurang tegas dan sabar dengan kecepatan lambat",b:"Tegas dan tidak sabar dengan kecepatan lambat",k:{A:'G',B:'I'}},
+  {q:"Saya biasanya membuat keputusan berdasarkan fakta atau bukti.",a:"Keputusan berdasarkan fakta atau bukti",b:"Keputusan berdasarkan perasaan, pengalaman, atau hubungan",k:{A:'D',B:'O'}},
+  {q:"Saya biasanya sering berkontribusi saat melakukan pembicaraan dalam grup.",a:"Sering berkontribusi dalam pembicaraan grup",b:"Jarang berkontribusi dalam pembicaraan grup",k:{A:'I',B:'G'}},
+  {q:"Saya biasanya lebih suka bekerja dengan atau melalui orang lain dan memberikan dukungan bila memungkinkan.",a:"Bekerja dengan orang lain dan memberikan dukungan",b:"Bekerja secara mandiri atau mengarahkan orang lain",k:{A:'O',B:'D'}},
+  {q:"Saya biasanya bertanya atau berbicara tentatif dan tidak langsung.",a:"Bertanya atau berbicara tentatif dan tidak langsung",b:"Bertanya berempati atau langsung menyatakan pendapat",k:{A:'G',B:'I'}},
+  {q:"Saya biasanya berfokus pada ide-ide, konsep, atau hasil.",a:"Berfokus pada ide, konsep, atau hasil",b:"Berfokus pada orang, interaksi, dan perasaan",k:{A:'D',B:'O'}},
+  {q:"Saya biasanya menggunakan gerak tubuh, ekspresi wajah, dan intonasi suara untuk menekankan poin pembicaraan.",a:"Menggunakan gerak tubuh dan ekspresi dalam berbicara",b:"Tidak menggunakan gerak tubuh dan ekspresi dalam berbicara",k:{A:'I',B:'G'}},
+  {q:"Saya biasanya menerima pandangan orang lain (ide, perasaan, dan kekhawatiran).",a:"Menerima pandangan orang lain",b:"Tidak menerima pandangan orang lain",k:{A:'O',B:'D'}},
+  {q:"Saya biasanya menanggapi risiko dengan mengubah secara hati-hati atau diprediksi.",a:"Menanggapi risiko secara hati-hati dan terprediksi",b:"Menanggapi risiko secara dinamis dan tidak terduga",k:{A:'G',B:'I'}},
+  {q:"Saya biasanya lebih memilih untuk menjaga perasaan dan pikiran pribadi daripada berbagi.",a:"Menjaga perasaan dan pikiran pribadi",b:"Mudah berbagi dan mendiskusikan perasaan dan pikiran pribadi",k:{A:'D',B:'O'}},
+  {q:"Saya biasanya mencari pengalaman dan situasi yang baru dan berbeda.",a:"Mencari pengalaman dan situasi baru",b:"Memilih situasi yang sudah dikenal atau serupa",k:{A:'I',B:'G'}},
+  {q:"Saya biasanya responsif terhadap agenda, minat dan perhatian orang lain.",a:"Responsif terhadap agenda dan minat orang lain",b:"Diarahkan mengenai agenda dan kepentingan sendiri",k:{A:'O',B:'D'}},
+  {q:"Saya biasanya menanggapi konflik perlahan dan tidak langsung.",a:"Menanggapi konflik perlahan dan tidak langsung",b:"Menanggapi konflik dengan cepat dan langsung",k:{A:'G',B:'I'}}
+];
+
+const SHEET=[
+  [{c:'O',q:0,a:'A'},{c:'G',q:1,a:'A'},{c:'D',q:1,a:'B'},{c:'I',q:0,a:'B'}],
+  [{c:'O',q:2,a:'B'},{c:'G',q:3,a:'B'},{c:'D',q:2,a:'A'},{c:'I',q:3,a:'A'}],
+  [{c:'O',q:4,a:'A'},{c:'G',q:5,a:'A'},{c:'D',q:5,a:'B'},{c:'I',q:4,a:'B'}],
+  [{c:'O',q:6,a:'B'},{c:'G',q:7,a:'B'},{c:'D',q:6,a:'A'},{c:'I',q:7,a:'A'}],
+  [{c:'O',q:8,a:'A'},{c:'G',q:9,a:'A'},{c:'D',q:9,a:'B'},{c:'I',q:8,a:'B'}],
+  [{c:'O',q:10,a:'B'},{c:'G',q:11,a:'B'},{c:'D',q:10,a:'A'},{c:'I',q:11,a:'A'}],
+  [{c:'O',q:12,a:'A'},{c:'G',q:13,a:'A'},{c:'D',q:13,a:'B'},{c:'I',q:12,a:'B'}],
+  [{c:'O',q:14,a:'B'},{c:'G',q:15,a:'B'},{c:'D',q:14,a:'A'},{c:'I',q:15,a:'A'}],
+  [{c:'O',q:16,a:'A'},{c:'G',q:17,a:'A'},{c:'D',q:17,a:'B'},{c:'I',q:16,a:'B'}]
+];
+
+const PROFILES={
+  OD:'Analyzer',DO:'Analyzer',GI:'Analyzer',IG:'Analyzer',
+  GD:'Controller',DG:'Controller',
+  OI:'Promoter',IO:'Promoter',DI:'Promoter',ID:'Promoter',
+  OG:'Supporter',GO:'Supporter'
+};
+
+let ans={},cur=0,nama='';
+
+function startQuiz(){
+  nama=document.getElementById('nama-in').value.trim();
+  if(!nama){alert('Silakan masukkan nama Anda.');return;}
+  document.getElementById('start-sec').style.display='none';
+  document.getElementById('quiz-sec').style.display='block';
+  renderQ();
+}
+
+function renderQ(){
+  const q=Qs[cur];
+  document.getElementById('prog').style.width=((cur+1)/18*100)+'%';
+  document.getElementById('prog-lbl').textContent=(cur+1)+'/18';
+  const sA=ans[cur]==='A',sB=ans[cur]==='B';
+  document.getElementById('q-card').innerHTML=`
+    <div class="q-eye">Pertanyaan ${cur+1} dari 18</div>
+    <div class="q-txt">${q.q}</div>
+    <div class="opts">
+      <div class="opt${sA?' sel':''}" onclick="pick('A')">
+        <div class="opt-lbl">PILIHAN A</div>
+        <div class="opt-txt">${q.a}</div>
+      </div>
+      <div class="opt${sB?' sel':''}" onclick="pick('B')">
+        <div class="opt-lbl">PILIHAN B</div>
+        <div class="opt-txt">${q.b}</div>
+      </div>
+    </div>`;
+  document.getElementById('btn-prev').disabled=cur===0;
+  document.getElementById('btn-next').textContent=cur===17?'Kirim Jawaban ✓':'Selanjutnya →';
+}
+
+function pick(c){ans[cur]=c;renderQ();}
+function prevQ(){if(cur>0){cur--;renderQ();}}
+function nextQ(){
+  if(!ans[cur]){alert('Silakan pilih jawaban terlebih dahulu.');return;}
+  if(cur<17){cur++;renderQ();}else{submitData();}
+}
+
+async function submitData(){
+  const sc={O:0,G:0,D:0,I:0};
+  for(let i=0;i<18;i++){const t=Qs[i].k[ans[i]];if(t)sc[t]++;}
+  const sorted=Object.entries(sc).sort((a,b)=>b[1]-a[1]);
+  const t1=sorted[0][0],t2=sorted[1][0];
+  const kodeKey=[t1,t2].sort().join('');
+  const tipe=PROFILES[kodeKey]||PROFILES[t1+t2]||'Tipe Unik';
+
+  let lembar='';
+  for(const row of SHEET){
+    lembar+=row.map(cell=>`${cell.c}:${cell.q+1}${cell.a}${ans[cell.q]===cell.a?'[✓]':'[ ]'}`).join(' | ')+'\n';
+  }
+  lembar+=`TOTAL → O:${sc.O} G:${sc.G} D:${sc.D} I:${sc.I}`;
+
+  const jawaban=Object.entries(ans).map(([i,v])=>`P${parseInt(i)+1}:${v}`).join(', ');
+  const tanggal=new Date().toLocaleString('id-ID');
+
+  document.getElementById('loading-overlay').classList.add('show');
+  try{
+    const fd=new FormData();
+    fd.append('form-name','caps-results');
+    fd.append('nama',nama);
+    fd.append('skor_O',sc.O);
+    fd.append('skor_G',sc.G);
+    fd.append('skor_D',sc.D);
+    fd.append('skor_I',sc.I);
+    fd.append('kode',t1+t2);
+    fd.append('tipe',tipe);
+    fd.append('tanggal',tanggal);
+    fd.append('jawaban',jawaban);
+    fd.append('lembar_jawaban',lembar);
+    await fetch('/',{method:'POST',body:fd});
+    document.getElementById('loading-overlay').classList.remove('show');
+    document.getElementById('quiz-sec').style.display='none';
+    document.getElementById('thanks-sec').style.display='block';
+    document.getElementById('thanks-nama').textContent=nama;
+  }catch(e){
+    document.getElementById('loading-overlay').classList.remove('show');
+    alert('Gagal mengirim. Periksa koneksi internet.\n'+e.message);
+  }
+}
+
+function resetAll(){
+  ans={};cur=0;nama='';
+  document.getElementById('nama-in').value='';
+  document.getElementById('thanks-sec').style.display='none';
+  document.getElementById('start-sec').style.display='block';
+  document.getElementById('prog').style.width='0%';
+  document.getElementById('prog-lbl').textContent='0/18';
+}
+</script>
+</body>
+</html>
